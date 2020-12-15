@@ -6,7 +6,7 @@ module.exports = [
         mode: "development",
         devtool: "source-map",
         entry: {
-            "npm-workspace": PATH.resolve(__dirname, "./src/main.ts"),
+            "npm-workspace": PATH.resolve(__dirname, "./@source/main.ts"),
         },
         module: {
             rules: [
@@ -40,7 +40,7 @@ module.exports = [
         name: "npm.workspace/production",
         mode: "production",
         entry: {
-            "npm-workspace": PATH.resolve(__dirname, "./src/main.ts"),
+            "npm-workspace": PATH.resolve(__dirname, "./@source/main.ts"),
         },
         module: {
             rules: [
