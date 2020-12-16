@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "./"
+		}
+	],
+	"settings": {
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": true
+		},
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.formatOnSave": true,
+		"eslint.packageManager": "npm",
+		"eslint.validate": ["typescript"],
+		"files.eol": "\n",
+		"files.exclude": {
+			"**/.DS_Store": true,
+			"**/.git": true,
+			"**/.hg": true,
+			"**/.svn": true,
+			"**/CVS": true
+		},
+		"prettier.disableLanguages": ["javascript", "typescript"],
+		"prettier.printWidth": 100,
+		"prettier.tabWidth": 4,
+		"prettier.trailingComma": "none",
+		"prettier.useTabs": true
+	}
+}

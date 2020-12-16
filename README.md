@@ -1,1 +1,1 @@
-# npm-workspace
+# workspace-cli
