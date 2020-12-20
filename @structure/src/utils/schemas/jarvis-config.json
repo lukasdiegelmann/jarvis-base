@@ -1,0 +1,52 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"type": "object",
+	"properties": {
+		"bundle": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"header": {
+						"type": "object",
+						"properties": {
+							"milieu": {
+								"type": "object",
+								"properties": {
+									"cwdPath": { "type": "string" },
+									"envPath": { "type": "string" }
+								},
+								"required": ["cwdPath"],
+								"additionalProperties": false
+							},
+							"behavior": {
+								"type": "object",
+								"properties": {
+									"isQuiet": { "type": "boolean" },
+									"shouldExecute": { "type": "boolean" },
+									"shouldJustInit": { "type": "boolean" }
+								},
+								"additionalProperties": false
+							}
+						},
+						"required": ["milieu"],
+						"additionalProperties": false
+					},
+					"config": { "type": "object" }
+				}
+			}
+		},
+		"inject": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"key": { "type": "string" },
+					"value": { "type": "object" }
+				},
+				"required": ["key", "value"],
+				"additionalProperties": false
+			}
+		}
+	}
+}

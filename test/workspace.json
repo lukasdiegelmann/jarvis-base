@@ -1,0 +1,60 @@
+{
+	"@jarvis/base/config": {
+		"bundle": [
+			{
+				"header": {
+					"milieu": {
+						"cwdPath": "C:\\Users\\oavoi\\Desktop\\Development\\workspace\\repositories\\lukasdiegelmann\\workspace\\test"
+					},
+					"behavior": {
+						"shouldExecute": true
+					}
+				},
+				"config": {
+					"name": "test/development",
+					"mode": "development",
+					"target": "node",
+					"entry": {
+						"test": "C:\\Users\\oavoi\\Desktop\\Development\\workspace\\repositories\\lukasdiegelmann\\workspace\\test\\src\\main.ts"
+					},
+					"module": {
+						"rules": [
+							{
+								"test": {
+									
+								},
+								"use": [
+									{
+										"loader": "babel-loader",
+										"options": {
+											"presets": [
+												"@babel/preset-env",
+												"@babel/preset-typescript"
+											],
+											"plugins": [
+												"@babel/plugin-transform-typescript",
+												"@babel/plugin-transform-runtime"
+											]
+										}
+									}
+								]
+							}
+						]
+					},
+					"resolve": {
+						"extensions": [
+							".ts"
+						]
+					},
+					"externals": [
+						null
+					],
+					"output": {
+						"filename": "test.bundle.js",
+						"path": "C:\\Users\\oavoi\\Desktop\\Development\\workspace\\repositories\\lukasdiegelmann\\workspace\\test\\dist"
+					}
+				}
+			}
+		]
+	}
+}

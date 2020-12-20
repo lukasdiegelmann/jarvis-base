@@ -3,10 +3,10 @@ const PATH = require("path");
 module.exports = [
     {
         name: "workspace/production",
-        mode: "production",
+        mode: "development",
         target: "node",
         entry: {
-            workspace: PATH.resolve(__dirname, "./@structure/main.ts"),
+            workspace: PATH.resolve(__dirname, "./@structure/master.ts"),
         },
         module: {
             rules: [
