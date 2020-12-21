@@ -3,7 +3,7 @@ const PATH = require("path");
 module.exports = [
     {
         name: "workspace/production",
-        mode: "development",
+        mode: "production",
         target: "node",
         entry: {
             workspace: PATH.resolve(__dirname, "./@structure/master.ts"),

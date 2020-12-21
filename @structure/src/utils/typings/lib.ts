@@ -29,8 +29,9 @@ export interface JarvisConfig {
 interface ProcessArgs {
     readonly milieu: Readonly<{
         projectPath: string;
-        focusedPath?: string;
+        compilePath?: string;
     }>;
+    readonly output: ComplexTerminal["type"] | SimpleTerminal["type"];
     readonly compilation: Readonly<{
         mode: "development" | "production";
         header: Partial<JarvisConfig["bundle"][0]["header"]>;
@@ -54,22 +55,16 @@ export interface Exception {
 
 export interface SimpleTerminal {
     readonly type: "simple";
-    readonly init: () => void;
-    readonly log: (string: string) => void;
-    readonly fin: (webpackStats: Stats) => void;
+    readonly init: (info: { focusPath: string }) => void;
+    readonly log: (info: { focusPath: string; log: string }) => void;
+    readonly fin: (info: { focusPath: string; webpackStats: Stats }) => void;
 }
 
 export interface ComplexTerminal {
     readonly type: "complex";
-    readonly init: (linearID: number) => void;
-    readonly log: (linearID: number, string: string) => void;
-    readonly fin: (
-        linearID: number,
-        payload: {
-            webpackStats: Stats;
-            filePath: string;
-        }
-    ) => void;
+    readonly init: (info: { linearID: number }) => void;
+    readonly log: (info: { linearID: number; log: string }) => void;
+    readonly fin: (info: { linearID: number; focusPath: string; webpackStats: Stats }) => void;
 }
 
 export interface AtomicsData {

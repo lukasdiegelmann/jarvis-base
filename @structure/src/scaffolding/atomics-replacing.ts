@@ -1,7 +1,9 @@
 import path from "path";
-import { GetAtomicsData, ReplaceAtomics, UseAtomicsData } from "./types";
+import { AtomicsData } from "../utils/typings/lib";
 
-const getAtomicsData: GetAtomicsData = (value) => {
+const getAtomicsData = (newlyValue: string): AtomicsData[] => {
+    const value = JSON.parse(JSON.stringify(newlyValue));
+
     const atomicData = [];
     let watchInfo = {
         metaInfo: { openCurlyBraces: 0, startIndex: 0, isEscaped: false },
@@ -15,7 +17,6 @@ const getAtomicsData: GetAtomicsData = (value) => {
         },
     };
 
-    // @ts-expect-error
     for (const i in value) {
         const char = value[i];
         const isNotWatching = !watchInfo.key.isWatching && !watchInfo.value.isWatching;
@@ -88,7 +89,7 @@ const getAtomicsData: GetAtomicsData = (value) => {
     return atomicData;
 };
 
-const useAtomicsData: UseAtomicsData = (atomicData) => {
+const useAtomicsData = (atomicData: AtomicsData): unknown => {
     if (atomicData.key.match(/^.{0}$/)) {
         return eval(atomicData.value)();
     }
@@ -102,7 +103,7 @@ const useAtomicsData: UseAtomicsData = (atomicData) => {
     throw new Error(`'${atomicData.key}' is not a valid atomic key.`);
 };
 
-const replaceAtomics: ReplaceAtomics = (structure) => {
+const replaceAtomics = <T>(structure: unknown): T => {
     switch (typeof structure) {
         case "object":
             for (const i in structure) {
@@ -142,7 +143,7 @@ const replaceAtomics: ReplaceAtomics = (structure) => {
         }
     }
 
-    return structure as any;
+    return structure as never;
 };
 
 export default replaceAtomics;

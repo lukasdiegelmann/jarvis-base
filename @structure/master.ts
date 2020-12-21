@@ -1,79 +1,60 @@
 import chokidar from "chokidar";
-import { Stats } from "webpack";
 import parseProcessArgv from "./src/scaffolding/process-argv-parsing";
 import parseProcessArgs from "./src/scaffolding/process-args-parsing";
-import handleException from "./src/scaffolding/exception-handling";
-import fabricateTerminal from "./src/scaffolding/terminal-fabricating";
+import fabricateTerminal, { createTerminalListener } from "./src/scaffolding/terminal-fabricating";
 import observeCompilation from "./src/scaffolding/compilation-observing";
-import store, { argsSliceActions } from "./src/utils/state/store";
-import { Main } from "./src/utils/typings/functions";
+import handleInjection from "./src/scaffolding/injection-handling";
+import store from "./src/utils/state/store";
+import { argsSliceActions } from "./src/utils/state/slices/args-slice";
+import { handleInjectionSliceActions } from "./src/utils/state/slices/handle-injections-slice";
 
-const main: Main = (processArgv) => {
-    try {
-        store.dispatch(argsSliceActions.setProcessArgs(parseProcessArgv(processArgv)));
+const main = (processArgv: string[]): void => {
+    store.dispatch(argsSliceActions.setProcessArgs(parseProcessArgv(processArgv)));
 
-        parseProcessArgs()
-            .then((newlyprojectArgs) => {
-                store.dispatch(argsSliceActions.setProjectArgs(newlyprojectArgs));
+    parseProcessArgs()
+        .then((newlyprojectArgs) => {
+            store.dispatch(argsSliceActions.setProjectArgs(newlyprojectArgs));
 
-                const { processArgs, projectArgs } = store.getState().args;
+            const { processArgs, projectArgs } = store.getState().args;
+            const terminal = fabricateTerminal(processArgs.output);
 
-                if (processArgs.milieu.focusedPath) {
-                    const terminal = fabricateTerminal("simple");
+            if (processArgs.milieu.compilePath) {
+                observeCompilation(
+                    processArgs.milieu.compilePath,
+                    createTerminalListener(terminal, processArgs.milieu.compilePath)
+                );
+            } else {
+                store.dispatch(handleInjectionSliceActions.setRevertFunction(handleInjection()));
+                const { revertFunction } = store.getState().handleInjection;
 
-                    observeCompilation(processArgs.milieu.focusedPath, (eventCode, ...data) => {
-                        switch (eventCode) {
-                            case 0:
-                                terminal.init();
-                                break;
-                            case 1:
-                                terminal.fin(data[0] as Stats);
-                                break;
-                            case 2:
-                                terminal.log(data[0] as string);
-                                break;
-                        }
-                    });
-                } else {
-                    const terminal = fabricateTerminal("complex");
-                    const watchPaths = [
-                        ...new Set(
-                            projectArgs.withoutAtomics["@jarvis/base/config"].bundle.map(
-                                (a) => a.header.milieu.cwdPath
-                            )
-                        ),
-                    ];
-                    const watcher = chokidar.watch(watchPaths, {
-                        ignoreInitial: true,
-                        persistent: true,
-                    });
+                ["SIGINT", "SIGTERM", "beforeExit"].forEach((signal) => {
+                    process.on(signal, () =>
+                        revertFunction()
+                            .then(() => process.exit(0))
+                            .catch(() => process.exit(1))
+                    );
+                });
 
-                    watcher.on("all", (_eventName, filePath) => {
-                        observeCompilation(filePath, (eventCode, ...data) => {
-                            switch (eventCode) {
-                                case 0:
-                                    terminal.init(data[1]);
-                                    break;
-                                case 1:
-                                    terminal.fin(data[1], {
-                                        filePath,
-                                        webpackStats: data[0] as Stats,
-                                    });
-                                    break;
-                                case 2:
-                                    terminal.log(data[1], data[0] as string);
-                                    break;
-                            }
-                        });
-                    });
-                }
-            })
-            .catch((exception) => {
-                handleException(exception);
-            });
-    } catch (exception) {
-        handleException(exception);
-    }
+                const chokidarWatchPaths = [
+                    ...new Set(
+                        projectArgs.withoutAtomics["@jarvis/base/config"].bundle.map(
+                            (a) => a.header.milieu.cwdPath
+                        )
+                    ),
+                ];
+                const chokidarWatcher = chokidar.watch(chokidarWatchPaths, {
+                    ignoreInitial: true,
+                    persistent: true,
+                });
+
+                chokidarWatcher.on("all", (_eventName, filePath) => {
+                    observeCompilation(filePath, createTerminalListener(terminal, filePath));
+                });
+            }
+        })
+        .catch((exception) => {
+            throw exception;
+        });
 };
 
 export default main;

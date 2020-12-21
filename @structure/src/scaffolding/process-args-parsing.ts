@@ -1,11 +1,11 @@
 import fs from "fs";
 import Ajv from "ajv";
-import replaceAtomics from "../atomics-replacing";
-import jarvisConfigSchema from "../../utils/schemas/jarvis-config.json";
-import store from "../../utils/state/store";
-import { ParseProcessArgs } from "./types";
+import replaceAtomics from "./atomics-replacing";
+import jarvisConfigSchema from "../utils/schemas/jarvis-config.json";
+import store from "../utils/state/store";
+import { Args } from "../utils/typings/lib";
 
-const parseProcessArgs: ParseProcessArgs = () =>
+const parseProcessArgs = (): Promise<Args["projectArgs"]> =>
     new Promise((resolve, reject) => {
         const state = store.getState();
 
@@ -27,7 +27,10 @@ const parseProcessArgs: ParseProcessArgs = () =>
                 }
 
                 if (new Ajv().compile(jarvisConfigSchema)(json["@jarvis/base/config"])) {
-                    resolve({ withAtomics: json, withoutAtomics: replaceAtomics(json) });
+                    resolve({
+                        withAtomics: json,
+                        withoutAtomics: replaceAtomics(JSON.parse(JSON.stringify(json))),
+                    });
                 } else {
                     reject({
                         errno: 202,
