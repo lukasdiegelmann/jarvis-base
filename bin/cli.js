@@ -1,3 +1,3 @@
 #! /usr/bin/env node
 
-require("../dist/jarvisBase.bundle.js").workspace.default(process.argv);
+require("../dist/jarvisBase.bundle.js").jarvisBase.default(process.argv);
