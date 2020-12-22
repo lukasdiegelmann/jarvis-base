@@ -1,8 +1,8 @@
 {
 	"author": "Oa | 沃地",
 	"bin": {
-		"@lukasdiegelmann/jarvis-base": "./bin/workspace.js",
-		"jarvis-base": "./bin/workspace.js"
+		"@lukasdiegelmann/jarvis-base": "./bin/cli.js",
+		"jarvis-base": "./bin/cli.js"
 	},
 	"bugs": {
 		"url": "https://github.com/lukasdiegelmann/npm-workspace/issues"
@@ -112,7 +112,7 @@
 		"workspace"
 	],
 	"license": "MIT",
-	"name": "workspace",
+	"name": "jarvis-base",
 	"publishConfig": {
 		"access": "public"
 	},
@@ -121,7 +121,7 @@
 		"url": "git+https://github.com/lukasdiegelmann/npm-workspace.git"
 	},
 	"scripts": {
-		"build": "webpack --config ./webpack.config.js --config-name workspace/production"
+		"build": "webpack --config ./webpack.config.js --config-name jarvisBase/production"
 	},
-	"version": "1.0.0"
+	"version": "1.0.4"
 }

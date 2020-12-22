@@ -2,11 +2,11 @@ const PATH = require("path");
 
 module.exports = [
     {
-        name: "workspace/production",
+        name: "jarvisBase/production",
         mode: "production",
         target: "node",
         entry: {
-            workspace: PATH.resolve(__dirname, "./@structure/master.ts"),
+            jarvisBase: PATH.resolve(__dirname, "./@structure/master.ts"),
         },
         module: {
             rules: [
@@ -34,7 +34,7 @@ module.exports = [
         output: {
             filename: "[name].bundle.js",
             path: PATH.resolve(__dirname, "./dist/"),
-            library: "workspace",
+            library: "jarvisBase",
             libraryTarget: "commonjs",
         },
     },
