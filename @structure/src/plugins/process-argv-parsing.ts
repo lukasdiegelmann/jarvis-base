@@ -25,22 +25,22 @@ const parseProcessArgv = (processArgv: string[]): Args["processArgs"] => {
         !argValues.compilation.mode.match(/d|development|p|production/)
     ) {
         throw {
-            errno: 100,
-            err: `'${argValues.compilation.mode}' is not a valid compilation mode.`,
+            name: "ProcessArgsError",
+            message: `You have to specify a valid compilation mode - '${argValues.compilation.mode}' is not a valid compilation mode.`,
         };
     }
 
     if (!argValues.milieu.projectPath) {
         throw {
-            errno: 101,
-            err: `'${argValues.milieu.projectPath}' is not a valid project path.`,
+            name: "ProcessArgsError",
+            message: `You have to specify a valid project path - '${argValues.milieu.projectPath}' is not a valid project path.`,
         };
     }
 
-    if (!argValues.output) {
+    if (!argValues.output || !argValues.output.match(/simple|complex/)) {
         throw {
-            errno: 102,
-            err: `'${argValues.output}' is not a valid output type.`,
+            name: "ProcessArgsError",
+            message: `You have to specify a valid output method - '${argValues.output}' is not a valid output method.`,
         };
     }
 

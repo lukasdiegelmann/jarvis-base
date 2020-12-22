@@ -106,10 +106,7 @@ const observeCompilation: ObserveCompilation = (focus, listener) => {
 
             webpackCompiler.run((err) => {
                 if (err) {
-                    throw {
-                        errno: 600,
-                        err,
-                    };
+                    throw err;
                 }
             });
         }

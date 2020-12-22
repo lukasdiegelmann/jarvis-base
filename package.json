@@ -1,8 +1,8 @@
 {
 	"author": "Oa | 沃地",
 	"bin": {
-		"@lukasdiegelmann/workspace": "./bin/workspace.js",
-		"workspace": "./bin/workspace.js"
+		"@lukasdiegelmann/jarvis-base": "./bin/workspace.js",
+		"jarvis-base": "./bin/workspace.js"
 	},
 	"bugs": {
 		"url": "https://github.com/lukasdiegelmann/npm-workspace/issues"

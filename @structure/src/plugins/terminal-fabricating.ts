@@ -2,6 +2,7 @@ import chalk from "chalk";
 import blessed from "blessed";
 import path from "path";
 import formatWebpackMessages from "webpack-format-messages";
+import constructString from "../utils/logging/string-constructor";
 import store from "../utils/state/store";
 import { SimpleTerminal, ComplexTerminal } from "../utils/typings/lib";
 import { Stats } from "webpack";
@@ -31,7 +32,7 @@ const fabricateComplexTerminal = (): ComplexTerminal => {
         }
     });
 
-    screen.key(["rechts"], () => {
+    screen.key(["right"], () => {
         for (let i = 0; i < processesPanel.children.length; i++) {
             if (processesPanel.children[i].children[1].focused) {
                 const k =
@@ -57,7 +58,10 @@ const fabricateComplexTerminal = (): ComplexTerminal => {
     });
 
     screen.key(["C-c"], () => {
-        process.exit(0);
+        store
+            .getState()
+            .handleInjection.revertFunction()
+            .then(() => process.exit(0));
     });
 
     screen.append(processesPanel);
@@ -70,25 +74,15 @@ const fabricateComplexTerminal = (): ComplexTerminal => {
                 internalState[info.linearID].invalidateProgress();
             }
             const processPanelID = internalState[info.linearID].id;
-            const compile = `${chalk.bold("[compile]")} ${chalk.underline(
-                path.relative(process.cwd(), info.focusPath)
-            )}`;
-            const compilationMode = `${chalk.bold("[mode]")} ${
-                processArgs.compilation.mode === "development" ? "D" : "P"
-            }`;
-            const compilationTime = `${chalk.bold("[time]")} ${
-                info.webpackStats.endTime - info.webpackStats.startTime
-            }ms`;
-            const compilationState = `${chalk.bold("[state]")} ${
-                info.webpackStats.hasErrors()
-                    ? chalk.bold.red("ERR!")
-                    : info.webpackStats.hasWarnings()
-                    ? chalk.bold.yellow("WRN!")
-                    : chalk.bold.green("SCS!")
-            }`;
-            processesPanel.children[
-                processPanelID
-            ].children[0].content = `(${compile} • ${compilationMode} • ${compilationTime} • ${compilationState})`;
+
+            processesPanel.children[processPanelID].children[0].content = constructString(
+                "high/terminal/complex/header",
+                {
+                    compilationMode: processArgs.compilation.mode,
+                    entryPath: path.relative(process.cwd(), info.focusPath),
+                    webpackStats: info.webpackStats,
+                }
+            );
             screen.render();
         },
         init: (info) => {
@@ -179,23 +173,12 @@ const fabricateSimpleTerminal = (): SimpleTerminal => {
     return {
         type: "simple",
         fin: (info) => {
-            const compilationTime = `${chalk.bold("[time]")} ${
-                info.webpackStats.endTime - info.webpackStats.startTime
-            }ms`;
-            const compilationState = `${chalk.bold("[state]")} ${
-                info.webpackStats.hasErrors()
-                    ? chalk.bold.red("ERR!")
-                    : info.webpackStats.hasWarnings()
-                    ? chalk.bold.yellow("WRN!")
-                    : chalk.bold.green("SCS!")
-            }`;
-            const compile = `${chalk.bold("[compile]")} ${chalk.underline(
-                path.relative(process.cwd(), info.focusPath)
-            )}`;
-            const compilationMode = `${chalk.bold("[mode]")} ${processArgs.compilation.mode}`;
-
             process.stdout.write(
-                `${compile} • ${compilationMode} • ${compilationTime} >> ${compilationState}\n`
+                constructString("high/terminal/simple/done", {
+                    compilationMode: processArgs.compilation.mode,
+                    entryPath: path.relative(process.cwd(), info.focusPath),
+                    webpackStats: info.webpackStats,
+                }) + "\n"
             );
 
             if (info.webpackStats.hasWarnings()) {
@@ -217,23 +200,20 @@ const fabricateSimpleTerminal = (): SimpleTerminal => {
             }
         },
         init: (info) => {
-            const compile = `${chalk.bold("[compile]")} ${chalk.underline(
-                path.relative(process.cwd(), info.focusPath)
-            )}`;
-            const compilationMode = `${chalk.bold("[mode]")} ${processArgs.compilation.mode}`;
-
             process.stdout.write(
-                `${compile} • ${compilationMode} >> ${chalk.bold.cyan("compiling...")}\n`
+                constructString("high/terminal/simple/compiling", {
+                    compilationMode: processArgs.compilation.mode,
+                    entryPath: path.relative(process.cwd(), info.focusPath),
+                }) + "\n"
             );
         },
         log: (info) => {
-            const compile = `${chalk.bold("[compile]")} ${chalk.underline(
-                path.relative(process.cwd(), info.focusPath)
-            )}`;
-            const compilationMode = `${chalk.bold("[mode]")} ${processArgs.compilation.mode}`;
-
             process.stdout.write(
-                `${compile} • ${compilationMode} >> ${chalk.bold("[output]")} ${info.log}\n`
+                constructString("high/terminal/simple/log", {
+                    compilationMode: processArgs.compilation.mode,
+                    entryPath: path.relative(process.cwd(), info.focusPath),
+                    log: info.log,
+                }) + "\n"
             );
         },
     };

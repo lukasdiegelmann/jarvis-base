@@ -42,7 +42,7 @@
 				"type": "object",
 				"properties": {
 					"key": { "type": "string" },
-					"value": { "type": "object" }
+					"value": {}
 				},
 				"required": ["key", "value"],
 				"additionalProperties": false

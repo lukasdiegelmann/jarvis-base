@@ -4,7 +4,7 @@ import { AtomicsData } from "../utils/typings/lib";
 const getAtomicsData = (newlyValue: string): AtomicsData[] => {
     const value = JSON.parse(JSON.stringify(newlyValue));
 
-    const atomicData = [];
+    const atomicsData = [];
     let watchInfo = {
         metaInfo: { openCurlyBraces: 0, startIndex: 0, isEscaped: false },
         key: {
@@ -54,7 +54,7 @@ const getAtomicsData = (newlyValue: string): AtomicsData[] => {
                     const value = watchInfo.value.container.join("");
                     const pos = [watchInfo.metaInfo.startIndex, parseInt(i)];
 
-                    atomicData.push({ key, value, pos });
+                    atomicsData.push({ key, value, pos });
                 }
 
                 watchInfo = {
@@ -71,7 +71,10 @@ const getAtomicsData = (newlyValue: string): AtomicsData[] => {
             }
 
             if (watchInfo.metaInfo.openCurlyBraces < 0) {
-                throw new Error(`Unexpected curly brace at '${i}' in ${value}`);
+                throw {
+                    name: "AtomicsParsingError",
+                    message: `Unexpected curly brace at '${i}' in ${value}.`,
+                };
             }
         }
 
@@ -86,21 +89,24 @@ const getAtomicsData = (newlyValue: string): AtomicsData[] => {
         }
     }
 
-    return atomicData;
+    return atomicsData;
 };
 
-const useAtomicsData = (atomicData: AtomicsData): unknown => {
-    if (atomicData.key.match(/^.{0}$/)) {
-        return eval(atomicData.value)();
+const useAtomicsData = (atomicsData: AtomicsData): unknown => {
+    if (atomicsData.key.match(/^.{0}$/)) {
+        return eval(atomicsData.value)();
     }
-    if (atomicData.key.match(/^regexp?$/)) {
-        return new RegExp(atomicData.value);
+    if (atomicsData.key.match(/^regexp?$/)) {
+        return new RegExp(atomicsData.value);
     }
-    if (atomicData.key.match(/^abspath$/)) {
-        return path.resolve(process.cwd(), atomicData.value);
+    if (atomicsData.key.match(/^abspath$/)) {
+        return path.resolve(process.cwd(), atomicsData.value);
     }
 
-    throw new Error(`'${atomicData.key}' is not a valid atomic key.`);
+    throw {
+        name: "AtomicsParsingError",
+        message: `'${atomicsData.key}' is not a valid atomics key.`,
+    };
 };
 
 const replaceAtomics = <T>(structure: unknown): T => {

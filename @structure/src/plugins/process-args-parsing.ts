@@ -1,8 +1,9 @@
 import fs from "fs";
 import Ajv from "ajv";
 import replaceAtomics from "./atomics-replacing";
-import jarvisConfigSchema from "../utils/schemas/jarvis-config.json";
+import jarvisConfigSchema from "../../assets/json/jarvis-config.json";
 import store from "../utils/state/store";
+import formatJson from "json-format";
 import { Args } from "../utils/typings/lib";
 
 const parseProcessArgs = (): Promise<Args["projectArgs"]> =>
@@ -13,16 +14,19 @@ const parseProcessArgs = (): Promise<Args["projectArgs"]> =>
             state.args.processArgs.milieu.projectPath,
             { encoding: "utf8" },
             (err, data) => {
-                const json = JSON.parse(data);
-
                 if (err) {
-                    reject({ errno: 200, err });
+                    reject({
+                        name: "ProjectArgsError",
+                        message: `Could not find file at '${state.args.processArgs.milieu.projectPath}'. This is probably due to an incorrect current working directory.`,
+                    });
                 }
+
+                const json = JSON.parse(data);
 
                 if (!json["@jarvis/base/config"]) {
                     reject({
-                        errno: 201,
-                        err: `'${json["@jarvis/base/config"]}' is not a valid jarvis config`,
+                        name: "ProjectArgsError",
+                        message: `Property '@jarvis/base/config' could not be found on project configuration. Please define a @jarvis/base config.`,
                     });
                 }
 
@@ -33,8 +37,10 @@ const parseProcessArgs = (): Promise<Args["projectArgs"]> =>
                     });
                 } else {
                     reject({
-                        errno: 202,
-                        err: `Invalid jarvis config received. Please compare to json-schema: \n\n${jarvisConfigSchema}`,
+                        name: "ProjectArgsError",
+                        message: `Invalid jarvis config received. Please compare to json-schema: \n\n${formatJson(
+                            jarvisConfigSchema
+                        )}`,
                     });
                 }
             }
