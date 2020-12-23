@@ -6,9 +6,11 @@ const handleInjection = (): (() => Promise<undefined>) => {
     const { processArgs, projectArgs } = store.getState().args;
     const printToProject = { ...projectArgs.withoutAtomics };
 
-    projectArgs.withoutAtomics["@jarvis/base/config"].inject.forEach(
-        (injection) => (printToProject[injection.key] = injection.value)
-    );
+    if (projectArgs.withoutAtomics["@jarvis/base/config"].inject) {
+        projectArgs.withoutAtomics["@jarvis/base/config"].inject.forEach(
+            (injection) => (printToProject[injection.key] = injection.value)
+        );
+    }
 
     fs.writeFile(processArgs.milieu.projectPath, formatJson(printToProject), (err) => {
         if (err)

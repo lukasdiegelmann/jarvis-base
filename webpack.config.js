@@ -3,7 +3,7 @@ const PATH = require("path");
 module.exports = [
     {
         name: "jarvisBase/production",
-        mode: "production",
+        mode: "development",
         target: "node",
         entry: {
             jarvisBase: PATH.resolve(__dirname, "./@structure/master.ts"),
