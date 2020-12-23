@@ -46,7 +46,7 @@ const parseProcessArgv = (processArgv: string[]): Args["processArgs"] => {
 
     return {
         compilation: {
-            mode: (argValues.compilation.mode ?? "").match(/d|development/)
+            mode: (argValues.compilation.mode ?? "").match(/(^d$)|(^development$)/)
                 ? "development"
                 : "production",
             header: JSON.parse(argValues.compilation.header ?? "{}"),
